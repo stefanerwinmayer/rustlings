@@ -7,15 +7,14 @@
 // imperative style for loops. Recreate this counting functionality using
 // iterators. Only the two iterator methods (count_iterator and
 // count_collection_iterator) need to be modified.
-// Execute `rustlings hint iterators5` for hints.
+// Execute `rustlings hint
+// iterators5` for hints.
 //
 // Make the code compile and the tests pass.
 
-// I AM NOT DONE
-
 use std::collections::HashMap;
 
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(PartialEq, Eq)]
 enum Progress {
     None,
     Some,
@@ -32,9 +31,11 @@ fn count_for(map: &HashMap<String, Progress>, value: Progress) -> usize {
     count
 }
 
-fn count_iterator(map: &HashMap<String, Progress>, value: Progress) -> usize {
+fn count_iterator(map: &HashMap<String, Progress>, value: &Progress) -> usize {
     // map is a hashmap with String keys and Progress values.
     // map = { "variables1": Complete, "from_str": None, ... }
+    map.values()
+        .fold(0, |acc, val| if val == value { acc + 1 } else { acc })
 }
 
 fn count_collection_for(collection: &[HashMap<String, Progress>], value: Progress) -> usize {
@@ -53,6 +54,10 @@ fn count_collection_iterator(collection: &[HashMap<String, Progress>], value: Pr
     // collection is a slice of hashmaps.
     // collection = [{ "variables1": Complete, "from_str": None, ... },
     //     { "variables2": Complete, ... }, ... ]
+    collection
+        .iter()
+        .map(|m| count_iterator(m, &value))
+        .fold(0, |acc, n| acc + n)
 }
 
 #[cfg(test)]
@@ -62,7 +67,7 @@ mod tests {
     #[test]
     fn count_complete() {
         let map = get_map();
-        assert_eq!(3, count_iterator(&map, Progress::Complete));
+        assert_eq!(3, count_iterator(&map, &Progress::Complete));
     }
 
     #[test]
@@ -70,7 +75,7 @@ mod tests {
         let map = get_map();
         assert_eq!(
             count_for(&map, Progress::Complete),
-            count_iterator(&map, Progress::Complete)
+            count_iterator(&map, &Progress::Complete)
         );
     }
 
